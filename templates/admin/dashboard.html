@@ -1,0 +1,103 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+   
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                
+                <h3>{{ total_commandes }}</h3>
+                <p class="mb-0">Total Commandes</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card-2">
+            <div class="card-body text-center">
+               
+                <h3>{{ commandes_en_attente }}</h3>
+                <p class="mb-0">En Attente</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card-3">
+            <div class="card-body text-center">
+               
+                <h3>{{ commandes_confirmees }}</h3>
+                <p class="mb-0">Confirmées</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card-4">
+            <div class="card-body text-center">
+               
+                <h3>{{ "%.2f"|format(chiffre_affaires) }} DH</h3>
+                <p class="mb-0">Chiffre d'Affaires</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+   
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5> Commandes Récentes</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Client</th>
+                                <th>Total</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for commande in commandes_recentes %}
+                            <tr>
+                                <td>#{{ commande.id }}</td>
+                                <td>{{ commande.utilisateur.nom }}</td>
+                                <td>{{ "%.2f"|format(commande.total) }} DH</td>
+                                <td>
+                                    <span class="badge bg-{% if commande.statut == 'En attente' %}warning{% elif commande.statut == 'Confirmée' %}success{% else %}secondary{% endif %}">
+                                        {{ commande.statut }}
+                                    </span>
+                                </td>
+                                <td>{{ commande.date_commande.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <a href="{{ url_for('admin_commande_detail', commande_id=commande.id) }}" 
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('admin_commandes') }}" class="btn btn-outline-primary">
+                        Voir toutes les commandes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   
+</div>
+{% endblock %}

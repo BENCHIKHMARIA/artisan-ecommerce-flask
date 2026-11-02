@@ -1,0 +1,124 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Détails de la commande {{ commande.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4> Commande {{ commande.id }}</h4>
+    <a href="{{ url_for('admin_commandes') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Retour aux commandes
+    </a>
+</div>
+
+<div class="row">
+   
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Informations de la commande</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Numéro :</strong> #{{ commande.id }}</p>
+                        <p><strong>Date :</strong> {{ commande.date_commande.strftime('%d/%m/%Y à %H:%M') }}</p>
+                        <p><strong>Statut :</strong> 
+                            <span class="badge bg-{% if commande.statut == 'En attente' %}warning{% elif commande.statut == 'Confirmée' %}success{% elif commande.statut == 'En préparation' %}info{% elif commande.statut == 'Expédiée' %}primary{% elif commande.statut == 'Livrée' %}success{% else %}danger{% endif %} fs-6">
+                                {{ commande.statut }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Client :</strong> {{ commande.utilisateur.nom }}</p>
+                        <p><strong>Email :</strong> {{ commande.utilisateur.email }}</p>
+                        <p><strong>Total :</strong> <span class="fs-5 fw-bold text-success">{{ "%.2f"|format(commande.total) }} DH</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      
+        <div class="card">
+            <div class="card-header">
+                <h5> Produits commandés</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Prix u</th>
+                                <th>Quantité</th>
+                                <th>Sous T</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in commande.items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if item.produit.image %}
+                                            <img src="{{ url_for('static', filename='images/' + item.produit.image) }}" 
+                                                 alt="{{ item.produit.nom }}" class="img-thumbnail me-3" 
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% endif %}
+                                        <div>
+                                            <strong>{{ item.produit.nom }}</strong>
+                                            <br><small class="text-muted">{{ item.produit.categorie }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ "%.2f"|format(item.prix_unitaire) }} DH</td>
+                                <td><span class="badge bg-primary">{{ item.quantite }}</span></td>
+                                <td><strong>{{ "%.2f"|format(item.prix_unitaire * item.quantite) }} DH</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-active">
+                                <th colspan="3" class="text-end">T :</th>
+                                <th>{{ "%.2f"|format(commande.total) }} DH</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('modifier_statut_commande', commande_id=commande.id) }}">
+                    <div class="mb-3">
+                        <label for="statut" class="form-label">Modifier le statut :</label>
+                        <select name="statut" id="statut" class="form-select">
+                            <option value="En attente" {% if commande.statut == 'En attente' %}selected{% endif %}>En attente</option>
+                            <option value="Confirmée" {% if commande.statut == 'Confirmée' %}selected{% endif %}>Confirmée</option>
+                            <option value="Livrée" {% if commande.statut == 'Livrée' %}selected{% endif %}>Livrée</option>
+                            <option value="Annulée" {% if commande.statut == 'Annulée' %}selected{% endif %}>Annulée</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-save"></i> Modifier le statut
+                    </button>
+                </form>
+                
+                    <a href="mailto:{{ commande.utilisateur.email }}" class="btn btn-outline-info">
+                        <i class="fas fa-envelope"></i> Contacter le client
+                    </a>
+                </div>
+            </div>
+        </div>
+
+       
+    </div>
+</div>
+
+
+{% endblock %}

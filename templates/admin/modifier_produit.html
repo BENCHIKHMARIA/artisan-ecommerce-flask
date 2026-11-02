@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Produit - Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Modifier le produit</h2>
+        
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Nom du produit *</label>
+                        <input type="text" class="form-control" id="nom" name="nom" value="{{ produit.nom }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description *</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" required>{{ produit.description }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="prix" class="form-label">Prix (MAD) *</label>
+                                <input type="number" step="0.01" class="form-control" id="prix" name="prix" value="{{ produit.prix }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock *</label>
+                                <input type="number" class="form-control" id="stock" name="stock" value="{{ produit.stock }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categorie" class="form-label">Catégorie *</label>
+                                <select class="form-control" id="categorie" name="categorie" required>
+                                    <option value="boites_artisanales" {{ 'selected' if produit.categorie == 'boites_artisanales' }}>Boîtes Artisanales</option>
+                                    <option value="art_de_la_table" {{ 'selected' if produit.categorie == 'art_de_la_table' }}>Art de la Table</option>
+                                    <option value="jeux_traditionnels" {{ 'selected' if produit.categorie == 'jeux_traditionnels' }}>Jeux Traditionnels</option>
+                                    <option value="accessoires" {{ 'selected' if produit.categorie == 'accessoires' }}>Accessoires</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Image</label>
+                                <input type="text" class="form-control" id="image" name="image" value="{{ produit.image }}" placeholder="nom_de_l_image.jpg">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="est_nouveaute" name="est_nouveaute" {{ 'checked' if produit.est_nouveaute }}>
+                        <label class="form-check-label" for="est_nouveaute">
+                            Marquer comme nouveauté
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    {% if produit.image %}
+                    <div class="mb-3">
+                        <label class="form-label">Image actuelle :</label>
+                        <img src="{{ url_for('static', filename='images/' + produit.image) }}" 
+                             alt="{{ produit.nom }}" class="img-fluid rounded">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Sauvegarder les modifications</button>
+                <a href="{{ url_for('admin_produits') }}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

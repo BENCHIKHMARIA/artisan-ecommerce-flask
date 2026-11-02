@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coopérative AL WISSAM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styless.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+   <header>
+        <div class="header-flex">
+            <div class="header-left">
+                {% if current_user.is_authenticated %}
+    <p>Bienvenue, {{ current_user.nom }} !</p>
+   <a href="{{ url_for('deconnexion') }}" class="logout-button">Se déconnecter</a>
+
+{% else %}
+    <a href="{{ url_for('connexion') }}"></a>
+    <a href="{{ url_for('inscription') }}"></a>
+{% endif %}
+
+
+            </div>
+            
+            <div class="header-center">
+                <div class="logo-container">
+                  
+                    <img src="{{ url_for('static', filename='images/Groupe des logos des coopérative argana-19.png') }}" alt="Coopérative AL WISSAM" class="logo">
+                </div>
+            </div>
+            
+            <div class="header-right">
+              <div class="header-right-icons">
+              
+
+
+<a href="{{ url_for('panier') }}" class="icon-link cart-icon">
+    <i class="fas fa-shopping-bag"></i>
+    <span class="cart-count">{{ panier_count if panier_count else 0 }}</span>
+</a>
+
+<div class="user-dropdown">
+    <a href="#" class="icon-link user-icon" onclick="toggleUserMenu(event)">
+        <i class="fas fa-user"></i>
+    </a>
+    <div class="user-menu" id="userMenu">
+      
+        <button onclick="window.location.href='{{ url_for('connexion') }}'">Connexion</button>
+        <button onclick="window.location.href='{{ url_for('inscription') }}'">S'inscrire</button>
+    </div>
+</div>
+
+   </div>
+            </div>
+        </div>
+
+<nav>
+  <ul class="menu-principal">
+    
+    <li><a href="{{ url_for('index') }}">Accueil</a></li>
+
+    <li class="menu-deroulant">
+      <a href="#">Nos créations</a>
+      <ul class="sous-menu">
+        <li><a href="{{ url_for('boites_artisanales') }}">Boîtes Artisanales</a></li>
+        <li><a href="{{ url_for('art_de_la_table') }}">Art de la Table</a></li>
+        <li><a href="{{ url_for('jeux_traditionnels') }}">Jeux Traditionnels et Accessoires</a></li>
+      </ul>
+    </li>
+
+    <li class="menu-deroulant">
+      <a href="#">Artisanat</a>
+      <ul class="sous-menu">
+         <li><a href="{{ url_for('nos_artisans') }}">Nos artisans</a></li>
+      </ul>
+    </li>
+
+    <li class="menu-deroulant">
+      <a href="#">À propos</a>
+      <ul class="sous-menu">
+         <li><a href="#notre histoire">Notre histoire</a></li>
+         <li><a href="#Nos valeurs">Nos Valeurs</a></li>
+         <li><a href="#Nos Objectifs">Nos Objectifs</a></li>
+      </ul>
+    </li>
+
+    <li><a href="#COORDONNÉES">Contact</a></li>
+  </ul>
+</nav>
+
+    </header> 
+   
+<section class="hero-container">
+   
+    <div class="hero-slide visible" id="slide1">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="subtitle">CRÉATIONS SINCÈRES</p>
+            <h1 class="main-title">SIGNATURE <br>ARTISANALE</h1>
+            <a href="#nouveautes" class="btn-decouvrir">DÉCOUVRIR</a>
+        </div>
+    </div>
+    
+    
+    <div class="hero-slide" id="slide2">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="subtitle">ARTISANAT MAROCAIN</p>
+            <h1 class="main-title">TRADITION<br>ANCESTRALE</h1>
+            <a href="#nouveautes" class="btn-decouvrir">DÉCOUVRIR</a>
+        </div>
+    </div>
+    
+    
+    <div class="hero-slide" id="slide3">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="subtitle">SAVOIR-FAIRE UNIQUE</p>
+            <h1 class="main-title">TRÉSORS<br>ARTISANAUX</h1>
+            <a href="#nouveautes" class="btn-decouvrir">DÉCOUVRIR</a>
+        </div>
+    </div>
+    
+    
+    <div class="hero-dots">
+        <span class="hero-dot active" onclick="changeSlide(1)"></span>
+        <span class="hero-dot" onclick="changeSlide(2)"></span>
+        <span class="hero-dot" onclick="changeSlide(3)"></span>
+    </div>
+</section>
+
+<section class="nouveautes" id="nouveautes">
+  <h2 class="section-title">NOUVEAUTÉS</h2>
+
+  <div class="slider-container">
+    <button class="slider-btn left-btn">&#8592;</button>
+
+    <div class="product-slider">
+      
+      {% for produit in produits_nouveautes %}
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=produit.id) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/' + produit.image) }}" class="main-image" alt="{{ produit.nom }}">
+            <img src="{{ url_for('static', filename='images/' + produit.image) }}" class="hover-image" alt="{{ produit.nom }}">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">{{ produit.nom }}</h3>
+          {% if produit.prix %}
+          <p class="product-price"></p>
+          {% endif %}
+        </a>
+      </div>
+      {% endfor %}
+
+     
+      {% if not produits_nouveautes %}
+    
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=1) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/88.webp') }}" class="main-image" alt="Produit 1">
+            <img src="{{ url_for('static', filename='images/88.webp') }}" class="hover-image" alt="Produit 1">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">Coffret en bois de Thuya avec marqueterie florale en arabesques</h3>
+        </a>
+      </div>
+
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=2) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/222.webp') }}" class="main-image" alt="Produit 2">
+            <img src="{{ url_for('static', filename='images/222.webp') }}" class="hover-image" alt="Produit 2">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">Boîte en bois de Thuya carrée</h3>
+        </a>
+      </div>
+
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=3) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/333.jpg') }}" class="main-image" alt="Produit 3">
+            <img src="{{ url_for('static', filename='images/333.jpg') }}" class="hover-image" alt="Produit 3">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">Boîte à Ouverture Secrète Pivotante en Bois</h3>
+        </a>
+      </div>
+
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=4) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/55.webp') }}" class="main-image" alt="Produit 4">
+            <img src="{{ url_for('static', filename='images/55.webp') }}" class="hover-image" alt="Produit 4">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">Petite boîte en bois de thuya <br>Art déco populaire</h3>
+        </a>
+      </div>
+
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=5) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/66.webp') }}" class="main-image" alt="Produit 5">
+            <img src="{{ url_for('static', filename='images/66.webp') }}" class="hover-image" alt="Produit 5">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">Thuya Woodbox Small Soap</h3>
+        </a>
+      </div>
+
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=6) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/77.jpg') }}" class="main-image" alt="Produit 6">
+            <img src="{{ url_for('static', filename='images/77.jpg') }}" class="hover-image" alt="Produit 6">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">flower -boite artisanal en bois</h3>
+        </a>
+      </div>
+
+      <div class="product-card">
+        <a href="{{ url_for('produit_detail', id=7) }}" class="product-link">
+          <div class="image-container">
+            <img src="{{ url_for('static', filename='images/99.webp') }}" class="main-image" alt="Produit 7">
+            <img src="{{ url_for('static', filename='images/99.webp') }}" class="hover-image" alt="Produit 7">
+            <div class="quick-view">APERÇU RAPIDE</div>
+          </div>
+          <h3 class="product-title">Boîte octogonale moyenne en bois de thuya</h3>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    <button class="slider-btn right-btn">&#8594;</button>
+  </div>
+</section>
+<style>
+.product-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+   
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+
+.product-slider::-webkit-scrollbar {
+    display: none; 
+}
+
+.product-card {
+    flex: 0 0 auto; 
+    min-width: 280px; 
+}
+</style>
+
+<div class="chabi-chic-section">
+  <h2 class="chabi-title">AL WISSAM, LE LIFESTYLE MAROCAIN TRADITIONNEL REVISITÉ</h2>
+  <h3 class="chabi-subtitle">TENDANCE, CHIC ET UNIQUEMENT FAIT MAIN</h3>
+  <p class="chabi-shipping">SHIPPING WORLDWIDE</p>
+</div>
+
+
+<div class="categories-section">
+  <a href="{{ url_for('boites_artisanales') }}" class="category-card">
+    <img src="{{ url_for('static', filename='images/7a1439b521ea33fe4dc2b8ad21dc00aa.jpg') }}" alt="Boîtes Artisanales">
+    <div class="category-label">Boîtes Artisanales</div>
+  </a>
+  <a href="{{ url_for('art_de_la_table') }}" class="category-card">
+    <img src="{{ url_for('static', filename='images/96a13392d888e8ca27471404ea0d12b1.jpg') }}" alt="Art de la table">
+    <div class="category-label">Art de la table</div>
+  </a>
+  <a href="{{ url_for('jeux_traditionnels') }}" class="category-card">
+    <img src="{{ url_for('static', filename='images/57959a1273590f43af9bfb4e91f0125a.jpg') }}" alt="Jeux Traditionnels">
+    <div class="category-label">Jeux et Accessoires</div>
+  </a>
+</div>
+
+<div class="advantages">
+  <div class="advantage-item">
+    <img src="{{ url_for('static', filename='images/drapeau-du-pays.png') }}" alt="Fabriqué au Maroc">
+    <p>Fabriqué au MAROC</p>
+  </div>
+  <div class="advantage-item">
+    <img src="{{ url_for('static', filename='images/artisan3.png') }}" alt="Fait main">
+    <p>Fait main par nos artisans</p>
+  </div>
+  <div class="advantage-item">
+    <img src="{{ url_for('static', filename='images/accueil.png') }}" alt="Depuis 2013">
+    <p>Existant depuis 2013</p>
+  </div>
+  <div class="advantage-item">
+    <img src="{{ url_for('static', filename='images/camion-de-livraison-mondial.png') }}" alt="Points de vente">
+    <p>+200 points de vente mondiaux</p>
+  </div>
+</div>
+
+<a href="{{ url_for('index') }}" id="notre histoire">
+    <h1 class="hero-title">NOTRE HISTOIRE</h1>
+</a>
+
+<h2 class="hero-subtitle">
+    Le Complexe Artisanal d'Essaouira est une initiative locale rassemblant 19 coopératives artisanales.  <br>
+    Il a pour mission de préserver les traditions culturelles et de favoriser l'indépendance économique des artisans,<br> notamment des femmes.
+</h2>
+
+<div class="hero-section">
+    <div class="overlay">
+        <div class="text-container">
+          
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('index') }}" id="Nos valeurs">
+    <h1 class="hero-title">NOS VALEURS</h1>
+</a>
+
+<h2 class="hero-subtitle">
+Durabilité : Nos coopératives s'engagent dans des pratiques respectueuses de l'environnement.<br>
+Authenticité : Tous nos produits sont faits main avec passion et savoir-faire.<br>
+Équité : Nous soutenons un commerce équitable et solidaire.
+</h2>
+
+<a href="{{ url_for('index') }}" id="Nos Objectifs">
+    <h1 class="hero-title">NOS OBJECTIFS</h1>
+</a>
+
+<h2 class="hero-subtitle">
+Nous aspirons à :<br>
+Donner de la visibilité aux artisans locaux sur le marché national et international.<br>
+Créer un lien direct entre producteurs et consommateurs.<br>
+Proposer une plateforme e-commerce moderne et accessible.
+</h2>
+
+
+<footer class="footer">
+    <div class="footer-container" id="COORDONNÉES">
+        <div class="footer-column">
+            <h3>COORDONNÉES</h3>
+            <p>BOUTIQUE N°19<br>COMPLEXE antégre de l'artisanat.<br>ARGANA - 44000 ESSAOUIRA<br></p>
+             <div class="social-icons">
+                <a href="https://www.facebook.com/votre-page-facebook" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://www.instagram.com/votre-page-instagram" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.tiktok.com/@votre-page-tiktok" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3>AL WISSAM</h3>
+            <ul>
+                <li>NOTRE HISTOIRE</li>
+                <li>NOS VALEURS</li>
+                <li>NOS OBJECTIFS</li>
+                <li>OUR SHOPS IN ESSAOUIRA</li>
+                <li>CONDITIONS DE VENTES</li>
+                <li>CONDITIONS D'UTILISATION</li>
+                <li>POLITIQUE DE REMBOURSEMENT</li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>CUSTOMER SERVICE</h3>
+            <ul>
+                <li>MON PANIER</li>
+                <li>LIVRAISON & RETOUR</li>
+                <li>COMMANDE & PAIEMENT</li>
+                <li>CONTACTEZ-NOUS</li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>NEWSLETTER</h3>
+            <p>Inscrivez-vous à notre site et recevez un <strong>code promotionnel.</strong></p>
+            
+           
+            
+        </div>
+    </div>
+</footer>
+
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

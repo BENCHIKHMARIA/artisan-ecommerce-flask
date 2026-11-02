@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finaliser ma commande - Coopérative AL WISSAM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #a67c52;
+        }
+
+        .checkout-header h1 {
+            color:rgb(6, 7, 7);
+            font-size: 2.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .checkout-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .checkout-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #a67c52;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #a67c52;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .required {
+            color: red;
+        }
+
+        .order-summary h3 {
+            color: #a67c52;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .item-details h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .item-details p {
+            margin: 0.2rem 0;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: #a67c52;
+        }
+
+        .total-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #a67c52;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-final {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            padding-top: 0.5rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .payment-methods {
+            margin-top: 1rem;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover,
+        .payment-option.selected {
+            border-color: #a67c52;
+            background-color: #f8f9fa;
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 0.8rem;
+        }
+
+        .payment-icon {
+            margin-left: auto;
+            font-size: 1.2rem;
+            color: #a67c52;
+        }
+
+        .btn-commander {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #a67c52, #8b6332);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-commander:hover {
+            background: linear-gradient(135deg, #8b6332, #a67c52);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(166, 124, 82, 0.3);
+        }
+
+        .btn-commander:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .security-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            border-left: 4px solid #a67c52;
+        }
+
+        .security-info i {
+            color: #a67c52;
+            margin-right: 0.5rem;
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .checkout-summary {
+                position: static;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-flex">
+            <div class="header-left">
+              
+            </div>
+            
+            <div class="header-center">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/Groupe des logos des coopérative argana-19.png') }}" alt="Coopérative AL WISSAM" class="logo">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-right-icons">
+
+                    <a href="{{ url_for('panier') }}" class="icon-link cart-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">{{ panier_count }}</span>
+                    </a>
+
+                    <div class="user-dropdown">
+                        <a href="#" class="icon-link user-icon" onclick="toggleUserMenu(event)">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <div class="user-menu" id="userMenu">
+                            {% if current_user.is_authenticated %}
+                                <span>Bonjour {{ current_user.nom }}</span>
+                                <button onclick="window.location.href='{{ url_for('deconnexion') }}'">Déconnexion</button>
+                            {% else %}
+                                <button onclick="window.location.href='{{ url_for('connexion') }}'">Connexion</button>
+                                <button onclick="window.location.href='{{ url_for('inscription') }}'">S'inscrire</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav>
+            <ul class="menu-principal">
+                <li><a href="{{ url_for('index') }}">Accueil</a></li>
+                <li class="menu-deroulant">
+                    <a href="#">Nos créations</a>
+                    <ul class="sous-menu">
+                        <li><a href="{{ url_for('boites_artisanales') }}">Boîtes Artisanales</a></li>
+                        <li><a href="{{ url_for('art_de_la_table') }}">Art de la Table</a></li>
+                        <li><a href="{{ url_for('jeux_traditionnels') }}">Jeux Traditionnels et Accessoires</a></li>
+                    </ul>
+                </li>
+                <li class="menu-deroulant">
+                    <a href="#">Artisanat</a>
+                    <ul class="sous-menu">
+                        <li><a href="{{ url_for('nos_artisans') }}">Nos artisans</a></li>
+                    </ul>
+                </li>
+                <li class="menu-deroulant">
+                    <a href="#">À propos</a>
+                    <ul class="sous-menu">
+                        <li><a href="#notre-histoire">Notre histoire</a></li>
+                        <li><a href="#nos-valeurs">Nos Valeurs</a></li>
+                        <li><a href="#nos-objectifs">Nos Objectifs</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main class="checkout-container">
+        <div class="checkout-header">
+            <h1><i class=""></i> Finaliser ma commande</h1>
+            <p>Vous êtes à une étape de finaliser votre commande</p>
+        </div>
+
+        <div class="checkout-content">
+           
+            <div class="checkout-form">
+                <form id="checkoutForm" action="{{ url_for('checkout') }}" method="POST">
+                   
+                    <div class="form-section">
+                        <h3><i class="fas fa-truck"></i> Informations de livraison</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prenom">Prénom <span class="required">*</span></label>
+                                <input type="text" id="prenom" name="prenom" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nom">Nom <span class="required">*</span></label>
+                                <input type="text" id="nom" name="nom" value="{{ current_user.nom if current_user.is_authenticated else '' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" value="{{ current_user.email if current_user.is_authenticated else '' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telephone">Téléphone <span class="required">*</span></label>
+                            <input type="tel" id="telephone" name="telephone" placeholder="+212 6 XX XX XX XX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adresse">Adresse complète <span class="required">*</span></label>
+                            <textarea id="adresse" name="adresse" rows="3" placeholder="Numéro, rue, quartier..." required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ville">Ville <span class="required">*</span></label>
+                                <select id="ville" name="ville" required>
+                                    <option value="">Sélectionnez votre ville</option>
+                                    <option value="Casablanca">Casablanca</option>
+                                    <option value="Rabat">Rabat</option>
+                                    <option value="Marrakech">Marrakech</option>
+                                    <option value="Fès">Fès</option>
+                                    <option value="Tanger">Tanger</option>
+                                    <option value="Agadir">Agadir</option>
+                                    <option value="Essaouira">Essaouira</option>
+                                    <option value="Autres">Autres villes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="code_postal">Code postal</label>
+                                <input type="text" id="code_postal" name="code_postal">
+                            </div>
+                        </div>
+                    </div>
+
+                  
+                    <div class="form-section">
+                        <h3><i class="fas fa-credit-card"></i> Méthode de paiement</h3>
+                        
+                        <div class="payment-methods">
+                            <div class="payment-option" onclick="selectPayment('cash')">
+                                <input type="radio" id="cash" name="methode_paiement" value="cash" checked>
+                                <label for="cash">Paiement à la livraison</label>
+                                
+                            </div>
+                            
+                            <div class="payment-option" onclick="selectPayment('card')">
+                                <input type="radio" id="card" name="methode_paiement" value="card">
+                                <label for="card">Carte bancaire</label>
+                              
+                            </div>
+                            
+                            <div class="payment-option" onclick="selectPayment('bank')">
+                                <input type="radio" id="bank" name="methode_paiement" value="bank">
+                                <label for="bank">Virement bancaire</label>
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="form-section">
+                        <h3><i class="fas fa-sticky-note"></i> Notes spéciales (optionnel)</h3>
+                        <div class="form-group">
+                            <textarea id="notes" name="notes" rows="3" placeholder="Instructions de livraison, notes spéciales..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="checkout-summary">
+                <div class="order-summary">
+                    <h3><i class="fas fa-receipt"></i> Résumé de commande</h3>
+                    
+                    {% for item in items_panier %}
+                    <div class="summary-item">
+                        <div class="item-info">
+                            <img src="{{ url_for('static', filename='images/' + item.produit.image) }}" 
+                                 alt="{{ item.produit.nom }}" 
+                                 class="item-image">
+                            <div class="item-details">
+                                <h4>{{ item.produit.nom }}</h4>
+                                <p>Quantité: {{ item.quantite }}</p>
+                                <p>Prix unitaire: {{ "%.2f"|format(item.produit.prix) }} dh</p>
+                            </div>
+                        </div>
+                        <div class="item-price">
+                            {{ "%.2f"|format(item.produit.prix * item.quantite) }} dh
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="total-section">
+                    <div class="total-row">
+                        <span>Sous-total:</span>
+                        <span>{{ "%.2f"|format(total) }} dh</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Frais de livraison:</span>
+                        <span id="frais-livraison">Gratuit</span>
+                    </div>
+                    <div class="total-row total-final">
+                        <span>Total à payer:</span>
+                        <span id="total-final">{{ "%.2f"|format(total) }} dh</span>
+                    </div>
+                </div>
+
+                <button type="submit" form="checkoutForm" class="btn-commander">
+                    <i class="fas fa-check-circle"></i> CONFIRMER LA COMMANDE
+                </button>
+
+                <div class="security-info">
+                    
+                    <small>Vos informations sont sécurisées et protégées</small>
+                </div>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="{{ url_for('panier') }}" style="color: #a67c52; text-decoration: none;">
+                        <i class="fas fa-arrow-left"></i> Retour au panier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<footer class="footer">
+    <div class="footer-container" id="COORDONNÉES">
+        <div class="footer-column">
+            <h3>COORDONNÉES</h3>
+            <p>BOUTIQUE N°19<br>COMPLEXE antégre de l'artisanat.<br>ARGANA - 44000 ESSAOUIRA<br></p>
+             <div class="social-icons">
+                <a href="https://www.facebook.com/votre-page-facebook" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://www.instagram.com/votre-page-instagram" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.tiktok.com/@votre-page-tiktok" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3>AL WISSAM</h3>
+            <ul>
+                <li>NOTRE HISTOIRE</li>
+                <li>NOS VALEURS</li>
+                <li>NOS OBJECTIFS</li>
+                <li>OUR SHOPS IN ESSAOUIRA</li>
+                <li>CONDITIONS DE VENTES</li>
+                <li>CONDITIONS D'UTILISATION</li>
+                <li>POLITIQUE DE REMBOURSEMENT</li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>CUSTOMER SERVICE</h3>
+            <ul>
+                <li>MON PANIER</li>
+                <li>LIVRAISON & RETOUR</li>
+                <li>COMMANDE & PAIEMENT</li>
+                <li>CONTACTEZ-NOUS</li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>NEWSLETTER</h3>
+            <p>Inscrivez-vous à notre site et recevez un <strong>code promotionnel.</strong></p>
+        
+           
+            
+        </div>
+    </div>
+</footer>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+     
+function selectPayment(method) {
+    
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+   
+    event.currentTarget.classList.add('selected');
+    
+   
+    updateShippingCosts(method);
+}
+
+function updateShippingCosts(method) {
+    const fraisElement = document.getElementById('frais-livraison');
+    const totalElement = document.getElementById('total-final');
+    const baseTotal = {{ total }};
+    
+    let fraisLivraison = 0;
+    
+    switch(method) {
+        case 'cash':
+            fraisElement.textContent = 'Gratuit';
+            break;
+        case 'card':
+            fraisElement.textContent = 'Gratuit';
+            break;
+        case 'bank':
+            fraisElement.textContent = 'Gratuit';
+            break;
+    }
+    
+    const nouveauTotal = baseTotal + fraisLivraison;
+    totalElement.textContent = nouveauTotal.toFixed(2) + ' dh';
+}
+
+
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+ 
+    const required = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    required.forEach(field => {
+        if (!field.value.trim()) {
+            field.style.borderColor = '#dc3545';
+            isValid = false;
+        } else {
+            field.style.borderColor = '#ddd';
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault(); 
+        alert('Veuillez remplir tous les champs obligatoires');
+        return;
+    }
+    
+    
+    const submitBtn = document.querySelector('.btn-commander');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
+    
+  
+});
+
+
+document.getElementById('ville').addEventListener('change', function() {
+    if (this.value === 'Essaouira') {
+        document.getElementById('code_postal').value = '44000';
+    }
+});
+
+document.getElementById('telephone').addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    if (value.startsWith('212')) {
+        value = '+' + value;
+    } else if (value.startsWith('0')) {
+        value = '+212 ' + value.substring(1);
+    } else if (value.length > 0 && !value.startsWith('+212')) {
+        value = '+212 ' + value;
+    }
+    this.value = value;
+});
+    </script>
+</body>
+</html>

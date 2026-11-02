@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de commande - Coopérative AL WISSAM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .confirmation-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .success-header {
+            text-align: center;
+            background: linear-gradient(135deg, #a67c52,rgb(36, 37, 37));
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: checkmark 0.6s ease-in-out;
+        }
+
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .success-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .success-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .order-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .confirmation-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-details, .next-steps {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            color: #a67c52;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #a67c52;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .order-items {
+            margin-top: 2rem;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: #a67c52;
+            font-size: 1.1rem;
+        }
+
+        .total-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-final {
+            border-top: 2px solid #a67c52;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #a67c52;
+        }
+
+        .delivery-address {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .next-steps {
+            height: fit-content;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .step-icon {
+            background: #a67c52;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #a67c52;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #8b6342;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #a67c52;
+            border: 2px solid #a67c52;
+        }
+
+        .btn-secondary:hover {
+            background: #a67c52;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #a67c52, #8b6342);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .contact-info h3 {
+            margin-bottom: 1rem;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .confirmation-content {
+                grid-template-columns: 1fr;
+            }
+
+            .order-info {
+                grid-template-columns: 1fr;
+            }
+
+            .success-header h1 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .item-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        .payment-method {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        .payment-method strong {
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-flex">
+            <div class="header-left">
+               
+            </div>
+            
+            <div class="header-center">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/Groupe des logos des coopérative argana-19.png') }}" alt="Coopérative AL WISSAM" class="logo">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-right-icons">
+
+                    <a href="{{ url_for('panier') }}" class="icon-link cart-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">{{ panier_count }}</span>
+                    </a>
+
+                    <div class="user-dropdown">
+                        <a href="#" class="icon-link user-icon" onclick="toggleUserMenu(event)">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <div class="user-menu" id="userMenu">
+                            {% if current_user.is_authenticated %}
+                                <span>Bonjour {{ current_user.nom }}</span>
+                                <button onclick="window.location.href='{{ url_for('deconnexion') }}'">Déconnexion</button>
+                            {% else %}
+                                <button onclick="window.location.href='{{ url_for('connexion') }}'">Connexion</button>
+                                <button onclick="window.location.href='{{ url_for('inscription') }}'">S'inscrire</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav>
+            <ul class="menu-principal">
+                <li><a href="{{ url_for('index') }}">Accueil</a></li>
+                <li class="menu-deroulant">
+                    <a href="#">Nos créations</a>
+                    <ul class="sous-menu">
+                        <li><a href="{{ url_for('boites_artisanales') }}">Boîtes Artisanales</a></li>
+                        <li><a href="{{ url_for('art_de_la_table') }}">Art de la Table</a></li>
+                        <li><a href="{{ url_for('jeux_traditionnels') }}">Jeux Traditionnels et Accessoires</a></li>
+                    </ul>
+                </li>
+                <li class="menu-deroulant">
+                    <a href="#">Artisanat</a>
+                    <ul class="sous-menu">
+                        <li><a href="{{ url_for('nos_artisans') }}">Nos artisans</a></li>
+                    </ul>
+                </li>
+                <li class="menu-deroulant">
+                    <a href="#">À propos</a>
+                    <ul class="sous-menu">
+                        <li><a href="#notre-histoire">Notre histoire</a></li>
+                        <li><a href="#nos-valeurs">Nos Valeurs</a></li>
+                        <li><a href="#nos-objectifs">Nos Objectifs</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+   
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main class="confirmation-container">
+       
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Commande confirmée !</h1>
+            <p>Merci pour votre commande. Nous avons bien reçu votre demande.</p>
+            <div class="order-number">
+                Commande N° {{ commande.id }}
+            </div>
+        </div>
+
+        <div class="confirmation-content">
+           
+            <div class="order-details">
+                <h2 class="section-title">
+                    <i class="fas fa-receipt"></i>
+                    Détails de votre commande
+                </h2>
+
+               
+                <div class="order-info">
+                    <div class="info-item">
+                        <div class="info-label">Date de commande</div>
+                        <div class="info-value">{{ commande.date_commande.strftime('%d/%m/%Y à %H:%M') }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Statut</div>
+                        <div class="info-value">{{ commande.statut }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total</div>
+                        <div class="info-value">{{ "%.2f"|format(commande.total) }} dh</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Client</div>
+                        <div class="info-value">{{ current_user.nom }}</div>
+                    </div>
+                </div>
+
+                
+                <div class="order-items">
+                    <h3>Articles commandés</h3>
+                    {% for item in commande.items %}
+                    <div class="item-row">
+                        <img src="{{ url_for('static', filename='images/' + item.produit.image) }}" 
+                             alt="{{ item.produit.nom }}" 
+                             class="item-image">
+                        <div class="item-details">
+                            <div class="item-name">{{ item.produit.nom }}</div>
+                            <div class="item-info">
+                                Quantité: {{ item.quantite }} × {{ "%.2f"|format(item.prix_unitaire) }} dh
+                            </div>
+                        </div>
+                        <div class="item-price">
+                            {{ "%.2f"|format(item.prix_unitaire * item.quantite) }} dh
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+              
+                <div class="total-summary">
+                    <div class="total-row">
+                        <span>Sous-total:</span>
+                        <span>{{ "%.2f"|format(commande.total) }} dh</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Frais de livraison:</span>
+                        <span>Gratuit</span>
+                    </div>
+                    <div class="total-row total-final">
+                        <span>Total payé:</span>
+                        <span>{{ "%.2f"|format(commande.total) }} dh</span>
+                    </div>
+                </div>
+
+                
+                <div style="margin-top: 2rem;">
+                    <h3>Adresse de livraison</h3>
+                    <div class="delivery-address">{{ commande.adresse_livraison }}</div>
+                </div>
+            </div>
+
+           
+            <div class="next-steps">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Prochaines étapes
+                </h2>
+
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>Confirmation par email</h4>
+                        <p>Vous recevrez un email de confirmation dans les prochaines minutes avec tous les détails de votre commande.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>Préparation</h4>
+                        <p>Nos artisans préparent soigneusement votre commande. Cela peut prendre 2-3 jours ouvrables.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>Expédition</h4>
+                        <p>Votre commande sera expédiée et vous recevrez un numéro de suivi pour suivre la livraison.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>Livraison</h4>
+                        <p>Réception de votre commande à l'adresse indiquée sous 5-7 jours ouvrables.</p>
+                    </div>
+                </div>
+
+                
+                <div class="payment-method">
+                    <strong>Méthode de paiement sélectionnée :</strong><br>
+                    Paiement à la livraison
+                    <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
+                        Vous paierez directement au livreur lors de la réception de votre commande.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+       
+        <div class="action-buttons">
+           
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                Retour à l'accueil
+            </a>
+        </div>
+
+       
+        <div class="contact-info">
+            <h3><i class="fas fa-headset"></i> Besoin d'aide ?</h3>
+            <p><strong>Téléphone :</strong> +212 6 XX XX XX XX</p>
+            <p><strong>Email :</strong> MARIA66@gmail.com</p>
+            <p>Nos disponible pour répondre à toutes vos questions !</p>
+        </div>
+    </main>
+
+<footer class="footer">
+    <div class="footer-container" id="COORDONNÉES">
+        <div class="footer-column">
+            <h3>COORDONNÉES</h3>
+            <p>BOUTIQUE N°19<br>COMPLEXE antégre de l'artisanat.<br>ARGANA - 44000 ESSAOUIRA<br></p>
+             <div class="social-icons">
+                <a href="https://www.facebook.com/votre-page-facebook" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://www.instagram.com/votre-page-instagram" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.tiktok.com/@votre-page-tiktok" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3>AL WISSAM</h3>
+            <ul>
+                <li>NOTRE HISTOIRE</li>
+                <li>NOS VALEURS</li>
+                <li>NOS OBJECTIFS</li>
+                <li>OUR SHOPS IN ESSAOUIRA</li>
+                <li>CONDITIONS DE VENTES</li>
+                <li>CONDITIONS D'UTILISATION</li>
+                <li>POLITIQUE DE REMBOURSEMENT</li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>CUSTOMER SERVICE</h3>
+            <ul>
+                <li>MON PANIER</li>
+                <li>LIVRAISON & RETOUR</li>
+                <li>COMMANDE & PAIEMENT</li>
+                <li>CONTACTEZ-NOUS</li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>NEWSLETTER</h3>
+            <p>Inscrivez-vous à notre site et recevez un <strong>code promotionnel.</strong></p>
+           
+           
+            
+        </div>
+    </div>
+</footer>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+          
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                step.style.opacity = '0';
+                step.style.transform = 'translateX(20px)';
+                
+                setTimeout(() => {
+                    step.style.transition = 'all 0.5s ease';
+                    step.style.opacity = '1';
+                    step.style.transform = 'translateX(0)';
+                }, index * 200);
+            });
+
+        
+            const items = document.querySelectorAll('.item-row');
+            items.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    item.style.transition = 'all 0.5s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 100 + 500);
+            });
+        });
+
+        
+        function printOrder() {
+            window.print();
+        }
+
+       
+        function shareOrder() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Ma commande AL WISSAM',
+                    text: 'J\'ai passé une commande chez AL WISSAM !',
+                    url: window.location.href,
+                });
+            }  
+        }  
+    </script>
+</body>
+</html>

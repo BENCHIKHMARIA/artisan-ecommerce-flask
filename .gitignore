@@ -1,0 +1,21 @@
+# Virtual environments
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Local data (never publish: users, orders, logs)
+instance/
+*.db
+*.sqlite3
+logs/
+*.log
+.env

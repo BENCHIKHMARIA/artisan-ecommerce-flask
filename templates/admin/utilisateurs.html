@@ -1,0 +1,177 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Gestion des Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5> Liste des Utilisateurs</h5>
+        <div class="d-flex gap-2">
+            <input type="search" class="form-control form-control-sm" placeholder="Rechercher un u..." id="searchUsers">
+        </div>
+    </div>
+    
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                        <th>Date d'inscription</th>
+                        <th>Commandes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for utilisateur in utilisateurs.items %}
+                    <tr>
+                        <td><strong>#{{ utilisateur.id }}</strong></td>
+                        <td>
+                            <div>
+                                <strong>{{ utilisateur.nom }}</strong>
+                                {% if utilisateur.est_admin %}
+                                    <span class="badge bg-danger ms-2">Admin</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ utilisateur.email }}" class="text-decoration-none">
+                                {{ utilisateur.email }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if utilisateur.est_admin %}
+                                <span class="badge bg-danger">Administrateur</span>
+                            {% else %}
+                                <span class="badge bg-primary">Client</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>
+                                {{ utilisateur.date_creation.strftime('%d/%m/%Y') }}
+                                <br><small class="text-muted">{{ utilisateur.date_creation.strftime('%H:%M') }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">
+                                {{ utilisateur.commandes|length }} commande(s)
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" title="Voir profil" 
+                                        onclick="showUserModal({{ utilisateur.id }}, '{{ utilisateur.nom }}', '{{ utilisateur.email }}', '{{ utilisateur.date_creation.strftime('%d/%m/%Y') }}', {{ utilisateur.commandes|length }}, {{ utilisateur.est_admin|lower }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <p>Aucun utilisateur trouvé</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+       
+        
+       
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="alert alert-primary">
+                    <i class="fas fa-users"></i>
+                    <strong>{{ utilisateurs.total }}</strong> utilisateur(s) au total
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-warning">
+                    <i class="fas fa-user-shield"></i>
+                    <strong>{{ utilisateurs.items|selectattr('est_admin')|list|length }}</strong> administrateur(s)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Détails de l'utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID :</strong> <span id="userId"></span></p>
+                        <p><strong>Nom :</strong> <span id="userName"></span></p>
+                        <p><strong>Email :</strong> <span id="userEmail"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Inscription :</strong> <span id="userDate"></span></p>
+                        <p><strong>Commandes :</strong> <span id="userOrders"></span></p>
+                        <p><strong>Type :</strong> <span id="userType"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <a href="#" id="emailUserBtn" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Envoyer un email
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+document.getElementById('searchUsers').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('#usersTable tbody tr');
+    
+    tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+
+function showUserModal(id, nom, email, date, commandes, estAdmin) {
+    document.getElementById('userId').textContent = '#' + id;
+    document.getElementById('userName').textContent = nom;
+    document.getElementById('userEmail').textContent = email;
+    document.getElementById('userDate').textContent = date;
+    document.getElementById('userOrders').textContent = commandes + ' commande(s)';
+    document.getElementById('userType').innerHTML = estAdmin ? 
+        '<span class="badge bg-danger">Administrateur</span>' : 
+        '<span class="badge bg-primary">Client</span>';
+    document.getElementById('emailUserBtn').href = 'mailto:' + email;
+    
+    new bootstrap.Modal(document.getElementById('userModal')).show();
+}
+
+
+function toggleAdminStatus(userId, makeAdmin) {
+    if (confirm('Êtes-vous sûr de vouloir modifier les droits de cet utilisateur ?')) {
+       
+        alert('Fonctionnalité à implémenter dans votre backend');
+    }
+}
+</script>
+{% endblock %}
